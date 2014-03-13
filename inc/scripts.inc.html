@@ -1,0 +1,86 @@
+<script type="text/javascript" src="js/skrollr/skrollr.min.js"></script>
+<script type="text/javascript" src="js/skrollr/skrollr.path.js"></script>
+<script type="text/javascript" src="js/skrollr/skrollr.menu.min.eyekon.js"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="js/skrollr/skrollr.ie.min.js"></script>
+<![endif]-->
+<script src="js/royalslider/jquery.royalslider.min.js"></script>
+<script src="js/jquery.mousewheel.js"></script>
+<script src="js/jquery.touchwipe.min.js"></script>
+<script src="js/jquery.magnific-popup.js"></script>
+<script type="text/javascript" src="js/default.js"></script>
+<script type="text/javascript">
+
+var 	fallRoutenHL_duration = 600,
+		fallRoutenHL_start = 7900,	//12800
+		fallRoutenHL_end = fallRoutenHL_start + fallRoutenHL_duration;
+
+function fallRoutenHL(s) {
+	var points = $('.route-hl-point');
+	var fallPoints = $('.fall-point');
+	if(fallPoints.length == 0) { 
+		points.each(function(index){
+			var _position = $(this).offset();
+			var top = Math.round(_position.top - $(window).scrollTop()) + 'px';
+			var left = Math.round(_position.left - $(window).scrollLeft()) + 'px';
+			
+			var navPoint = getNavPoint (index);
+			
+			if(navPoint.top != 0) {
+				var navPointTop = navPoint.top + 'px';
+				var navPointLeft = navPoint.left + 'px';
+	
+				var imgHtml = '<img class="fall-point" src="'+$(this).attr('src')+'" data-0="opacity:0" '+
+										'data-'+ parseInt(fallRoutenHL_start - 1) +'="" '+
+										'data-'+fallRoutenHL_start+'="top:'+top+';left:'+left+';opacity:1" '+
+										'data-'+fallRoutenHL_end+'="top:'+navPointTop+';left:'+navPointLeft+';opacity:1" '+
+										'data-'+parseInt( fallRoutenHL_end + 1 )+'="top:'+navPointTop+';left:'+navPointLeft+';opacity:0">';
+				$('#container').append(imgHtml );
+			}
+		});
+		s.refresh();
+	}
+}
+
+function getNavPoint (target) {
+	//target fängt 0 an
+	var navPoint = $('#route-highlight-nav').find('a').eq(target);
+	if(navPoint.offset()) {
+		var navPointTop = navPoint.offset().top - $(window).scrollTop();
+		var navPointLeft = navPoint.offset().left;
+		return {top:navPointTop,left:navPointLeft}		
+	} else {
+		return {top:0,left:0}
+	}
+}
+
+var route2_set = false;
+var org_atr = $('#box2').attr('data-_svg');
+var pathEasing = skrollr.easingFromPath(document.getElementById('route1'));
+var pathEasing_zwischen = skrollr.easingFromPath(document.getElementById('route2'), {c_length: 0.198806357});
+
+var s = skrollr.init({
+	easing: {
+		// intro route
+		pathx: pathEasing.x,
+		pathy: pathEasing.y,
+		// zwischenroute #1
+		path_zwischen_x: pathEasing_zwischen.x,
+		path_zwischen_y: pathEasing_zwischen.y,
+	},
+	render: function(data) {
+		//Log the current scroll position.
+		//console.log(data);
+		if( data.curTop >= fallRoutenHL_start && data.curTop < (fallRoutenHL_start + 100)) {
+			fallRoutenHL(s);
+		}
+	},
+	smoothScrolling:true,
+	smoothScrollingDuration: 1000,
+	constants: {
+			fall_start: 7900,
+			fall_end: 8500
+		}
+});
+skrollr.menu.init(s);
+</script>
